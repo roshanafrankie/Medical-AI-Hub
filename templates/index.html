@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Hub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #059669;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: #1e293b;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page {
+            display: none;
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .active-page { display: block; }
+
+        .hero { text-align: center; padding: 4rem 0; }
+        .hero h1 { font-size: 3.5rem; color: #0f172a; margin-bottom: 1.5rem; }
+        .hero p { font-size: 1.25rem; color: var(--secondary); margin-bottom: 2.5rem; max-width: 600px; margin-inline: auto; }
+        
+        .start-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1.25rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+        .start-btn:hover { transform: scale(1.05); }
+
+        .upload-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .drop-zone {
+            border: 3px dashed #e2e8f0;
+            border-radius: 1rem;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            position: relative;
+        }
+        .drop-zone:hover { border-color: var(--primary); background: #f0f7ff; }
+        .drop-zone i { font-size: 4rem; color: var(--primary); margin-bottom: 1rem; }
+
+        #img-preview {
+            display: none;
+            max-width: 100%;
+            max-height: 300px;
+            margin: 0 auto;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        input[type="file"] { display: none; }
+
+        .result-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .prob-bar {
+            height: 10px;
+            background: #f1f5f9;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .prob-fill { height: 100%; background: var(--success); border-radius: 5px; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .error-banner {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .section-title {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .prob-columns {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .prob-column {
+            flex: 1;
+        }
+
+        /* Center image on the right side */
+        .image-side {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-side img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .result-container {
+                grid-template-columns: 1fr;
+            }
+            .prob-columns {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fa-solid fa-house-medical"></i> MED-AI</div>
+        <div class="nav-links">
+            <span onclick="showPage('welcome')" style="cursor:pointer; margin-right:20px;">Home</span>
+            <span onclick="showPage('upload')" style="cursor:pointer;">Analyze</span>
+        </div>
+    </nav>
+
+    <section id="welcome" class="page active-page">
+        <div class="hero">
+            <h1>Advanced Medical Image Diagnosis</h1>
+            <p>Upload Blood Cell, Blood Cancer Cell, Chest X-ray, or Brain MRI images for automated multi-model analysis.</p>
+            <button class="start-btn" onclick="showPage('upload')">Get Started <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:2rem; text-align:center; margin-top:3rem;">
+            <div>
+                <i class="fa-solid fa-droplet" style="font-size:2rem; color:var(--primary)"></i>
+                <h3>Blood Cells</h3>
+            </div>
+            <div>
+                <i class="fa-solid fa-ribbon" style="font-size:2rem; color:var(--primary)"></i>
+                <h3>Blood Cancer Cells</h3>
+            </div>
+            <div>
+                <i class="fa-solid fa-lungs" style="font-size:2rem; color:var(--primary)"></i>
+                <h3>Chest X-Ray</h3>
+            </div>
+            <div>
+                <i class="fa-solid fa-brain" style="font-size:2rem; color:var(--primary)"></i>
+                <h3>Brain MRI</h3>
+            </div>
+        </div>
+    </section>
+
+    <section id="upload" class="page">
+        <span class="back-link" onclick="showPage('welcome')"><i class="fa-solid fa-chevron-left"></i> Back to Home</span>
+        <div class="upload-card">
+            {% if error %}
+            <div class="error-banner">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <h2>Upload Specimen</h2>
+            <p>Select a clear medical image for analysis</p>
+            
+            <form action="/predict" method="post" enctype="multipart/form-data">
+                <label class="drop-zone">
+                    <input type="file" name="image" id="file-input" required onchange="previewImage(event)">
+                    
+                    <div id="upload-instructions">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p id="file-name">Click to browse or drag and drop image</p>
+                    </div>
+
+                    <img id="img-preview" src="#">
+                </label>
+                <button type="submit" class="start-btn" style="width:100%">Run Diagnostics</button>
+            </form>
+        </div>
+    </section>
+
+    {% if image_path %}
+    <section id="result" class="page">
+        <span class="back-link" onclick="showPage('upload')"><i class="fa-solid fa-rotate-left"></i> Analyze New Image</span>
+        <div class="result-container">
+            <div class="info-side">
+                <span style="background:#dcfce7; color:#166534; padding:5px 15px; border-radius:20px; font-weight:bold; font-size:0.8rem;">
+                    {{ type_label|upper }}
+                </span>
+
+                <h1 style="margin: 1rem 0;">{{ detail_label }}</h1>
+
+                {% if type_confidence is defined %}
+                <p style="color: var(--secondary); font-size:0.9rem; margin-top:0;">
+                    Type confidence: {{ (type_confidence * 100)|round(1) }}%
+                </p>
+                {% endif %}
+
+                {% if detail_probs or cancer_probs %}
+                <div class="prob-columns">
+                    {% if detail_probs %}
+                    <div class="prob-column">
+                        <h3 class="section-title">Detailed probabilities</h3>
+                        {% for cls, prob in detail_probs.items() %}
+                        <div style="margin-bottom: 1.0rem;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                                <span>{{ cls }}</span>
+                                <span>{{ (prob * 100)|round(1) }}%</span>
+                            </div>
+                            <div class="prob-bar">
+                                <div class="prob-fill" style="width: {{ prob * 100 }}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if cancer_probs %}
+                    <div class="prob-column">
+                        <h3 class="section-title">Cancer subtype probabilities</h3>
+                        {% for cls, prob in cancer_probs.items() %}
+                        <div style="margin-bottom: 1.0rem;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                                <span>{{ cls }}</span>
+                                <span>{{ (prob * 100)|round(1) }}%</span>
+                            </div>
+                            <div class="prob-bar">
+                                <div class="prob-fill" style="width: {{ prob * 100 }}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p style="font-size:0.9rem; color:var(--secondary); margin-top:1rem;">
+                    No detailed class probabilities available.
+                </p>
+                {% endif %}
+
+                {% if type_probs %}
+                <h3 class="section-title">Modality probabilities</h3>
+                {% for cls, prob in type_probs.items() %}
+                <div style="margin-bottom: 0.75rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                        <span>{{ cls }}</span>
+                        <span>{{ (prob * 100)|round(1) }}%</span>
+                    </div>
+                    <div class="prob-bar">
+                        <div class="prob-fill" style="background:#38bdf8; width: {{ prob * 100 }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="image-side">
+                <img src="{{ image_path }}" alt="Diagnosis Input">
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active-page');
+            });
+            const target = document.getElementById(pageId);
+            if(target) target.classList.add('active-page');
+            window.scrollTo(0,0);
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            const file = event.target.files[0];
+            
+            if (file) {
+                reader.onload = function() {
+                    const preview = document.getElementById('img-preview');
+                    const instructions = document.getElementById('upload-instructions');
+                    preview.src = reader.result;
+                    preview.style.display = 'block';
+                    instructions.style.display = 'none';
+                    const fileNameEl = document.getElementById('file-name');
+                    if (fileNameEl) fileNameEl.textContent = file.name;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropZone = document.querySelector('.drop-zone');
+            const fileInput = document.getElementById('file-input');
+
+            if (!dropZone || !fileInput) return;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.style.borderColor = 'var(--primary)';
+                    dropZone.style.background = '#f0f7ff';
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.style.borderColor = '#e2e8f0';
+                    dropZone.style.background = 'transparent';
+                });
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (!files || !files.length) return;
+
+                fileInput.files = files;
+                const changeEvent = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(changeEvent);
+            });
+        });
+
+        {% if image_path %}
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('result');
+        });
+        {% endif %}
+    </script>
+</body>
+</html>
