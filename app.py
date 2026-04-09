@@ -6,9 +6,6 @@ from tensorflow.keras.preprocessing import image
 
 app = Flask(__name__)
 
-# -------------------------
-# 1) Load models once
-# -------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 type_model_path = os.path.join(BASE_DIR, "models", "type_check_TL.h5")
@@ -90,7 +87,6 @@ def predict():
     img_path = os.path.join(upload_path, file.filename)
     file.save(img_path)
 
-    # 1) Type prediction
     x_type = load_and_preprocess(img_path, IMG_SIZE_TYPE)
     type_probs = type_model.predict(x_type)[0]
 
@@ -106,10 +102,9 @@ def predict():
     type_conf = best_conf
 
     detail_label = "Not predicted"
-    detail_probs = None        # main detail probs (cells / xray / mri / cancer)
-    cancer_probs_dict = None   # cancer subtype probs (for blood or cancer cells)
-
-    # Out-of-distribution rule
+    detail_probs = None        
+    cancer_probs_dict = None   
+    
     if best_conf < 0.7 or gap < 0.25:
         type_label = "Unknown / Not a recognized medical image"
     else:
@@ -172,8 +167,6 @@ def predict():
                 detail_label = "Uncertain cancer cell type"
             else:
                 detail_label = cancer_classes[cancer_idx]
-
-            # Only use the cancer_probs section (no duplicate)
             detail_probs = None
 
     return render_template(
