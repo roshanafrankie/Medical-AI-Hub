@@ -59,9 +59,14 @@ The application employs a **Router-Expert** architecture to maximize diagnostic 
 - **Clinical Dashboard:** Interactive visualizations using Plotly including Morphology Donut Charts and Malignancy Probability Bars.
 - **Theme-Adaptive UI:** Seamlessly switches between Light and Dark modes with transparent, high-contrast charts.
 
-## 📊 Datasets Used
-* [Original Data Sources] - https://drive.google.com/drive/folders/1RObgiaza_J5VydhyuXll9wjOVJAF0FYy?usp=sharing
-* [Combined Research Dataset] - https://drive.google.com/drive/folders/1k2X6yKKwo0Asy5n3wNk9fDpuF322s8qv?usp=drive_link
+## 📂 Datasets Used
+This project integrates multiple high-quality datasets to cover a broad spectrum of medical imaging:
+
+* **Chest X-ray:** [Kaggle - Pneumonia Dataset](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
+* **MRI:** [Kaggle - Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
+* **Cancer Cells:** [Kaggle - Blood Cell Cancer (ALL)](https://www.kaggle.com/datasets/mohammadamireshraghi/blood-cell-cancer-all-4class)
+* **Blood Cells:** [Kaggle - Blood Cells Dataset](https://www.kaggle.com/datasets/paultimothymooney/blood-cells)
+* **Combined New Dataset:** [Google Drive - Combined Research Data](https://drive.google.com/drive/folders/1tohNKrzLkQZX4ybgt590U9NkTIKwUWZB?usp=sharing)
 
 ## 💻 Tech Stack
 - **Frontend:** Streamlit (Custom CSS injected for clinical-grade UI)
