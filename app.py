@@ -17,18 +17,26 @@ import plotly.express as px
 # 2. PAGE CONFIGURATION
 st.set_page_config(page_title="MED AI Hub", page_icon="logo.png", layout="wide")
 
-# 3. ADVANCED UI STYLING
+# 3. ADVANCED UI STYLING (Mobile Responsive Fixes)
 st.markdown("""
     <style>
-    [data-testid="stSidebar"] {
-        width: 310px !important;
-        min-width: 310px !important;
-        max-width: 310px !important;
+    /* Fixed Sidebar Width for Desktop, Flexible for Mobile */
+    @media (min-width: 768px) {
+        [data-testid="stSidebar"] {
+            width: 310px !important;
+        }
     }
-    [data-testid="stSidebarResizer"] { display: none !important; }
+
+    /* Force all elements in sidebar to align center */
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        align-items: center;
+        text-align: center;
+    }
+
     .main-title-block { text-align: center; margin-bottom: 2rem; }
-    .main-title-block h1 { font-size: 2.2rem; margin-bottom: 0; }
+    .main-title-block h1 { font-size: clamp(1.5rem, 5vw, 2.2rem); margin-bottom: 0; }
     .main-title-block p { color: #64748b; font-size: 1rem; }
+    
     .instruction-card {
         padding: 15px;
         border-radius: 10px;
@@ -36,7 +44,9 @@ st.markdown("""
         border: 1px solid rgba(37, 99, 235, 0.2);
         margin-bottom: 20px;
         font-size: 0.9rem;
+        text-align: left; /* Keep instructions readable */
     }
+    
     .stButton>button {
         width: 100%;
         border-radius: 10px;
@@ -51,11 +61,12 @@ st.markdown("""
 
 # 4. SIDEBAR CONFIGURATION
 with st.sidebar:
-    left, center, right = st.columns([1, 2, 1])
-    with center:
-        if os.path.exists("logo.png"):
-            st.image("logo.png", width=120)
-        st.markdown("<h1 style='text-align:center; font-size:1.4rem; margin-top:4px;'>MED AI v2.0</h1>", unsafe_allow_html=True)
+    # Direct centering for the logo
+    if os.path.exists("logo.png"):
+        st.image("logo.png", width=120)
+    
+    # Adding text-align:center directly back here
+    st.markdown("<h1 style='text-align:center; font-size:1.4rem; margin-top:4px;'>MED AI v2.0</h1>", unsafe_allow_html=True)
 
     st.markdown("---")
     st.subheader("⚙️ Analysis Settings")
@@ -73,7 +84,7 @@ with st.sidebar:
     threshold = st.slider("Sensitivity Threshold", 0.0, 1.0, 0.6, help="Min probability for confirmed diagnosis.")
     
     st.markdown("---")
-    st.warning("**⚠️ Medical Disclaimer:** This AI assistant provides diagnostic suggestions based on deep learning patterns. It is intended for clinical support only. **Always consult a certified medical professional** for official diagnosis and treatment.")
+    st.warning("**⚠️ Medical Disclaimer:** This AI assistant provides diagnostic suggestions. Always consult a certified medical professional for official diagnosis.")
 
 # 5. HEADER
 st.markdown("""
