@@ -73,7 +73,7 @@ with st.sidebar:
     threshold = st.slider("Sensitivity Threshold", 0.0, 1.0, 0.6, help="Min probability for confirmed diagnosis.")
     
     st.markdown("---")
-    st.warning("**⚠️ Medical Disclaimer:** Consult a certified medical professional for official diagnosis.")
+    st.warning("**⚠️ Medical Disclaimer:** This AI assistant provides diagnostic suggestions based on deep learning patterns. It is intended for clinical support only. **Always consult a certified medical professional** for official diagnosis and treatment.")
 
 # 5. HEADER
 st.markdown("""
