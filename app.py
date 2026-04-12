@@ -15,7 +15,7 @@ from PIL import Image
 import plotly.express as px
 
 # 2. PAGE CONFIGURATION
-st.set_page_config(page_title="MED AI Hub", page_icon="logo.png", layout="wide")
+st.set_page_config(page_title="NEURAL MED HUB", page_icon="logo.png", layout="wide")
 
 # 3. ADVANCED UI STYLING (Mobile Responsive Fixes)
 st.markdown("""
@@ -66,7 +66,7 @@ with st.sidebar:
         st.image("logo.png", width=120)
     
     # Adding text-align:center directly back here
-    st.markdown("<h1 style='text-align:center; font-size:1.4rem; margin-top:4px;'>MED AI v2.0</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; font-size:1.4rem; margin-top:4px;'>NEURAL MED v2.0</h1>", unsafe_allow_html=True)
 
     st.markdown("---")
     st.subheader("⚙️ Analysis Settings")
